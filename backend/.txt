@@ -1,0 +1,160 @@
+// REGISTER FOR JOB SEEKER AND RECRUTER IN SAME 
+
+POST http://localhost:9265/api/auth/register
+
+// LOGIN FOR JOB SEEKER AND RECRUTER IN SAME 
+
+POST http://localhost:9265/api/auth/login
+
+
+//Jobs
+
+🌍 1️⃣ Get All Jobs (Public)
+GET http://localhost:9265/api/jobs
+
+🔍 2️⃣ Get Job by ID (Public)
+GET http://localhost:9265/api/jobs/:jobId
+
+➕ 3️⃣ Create Job (Recruiter only)
+POST http://localhost:9265/api/jobs
+
+✏️ 4️⃣ Update Job (Owner Recruiter)
+PUT http://localhost:9265/api/jobs/:jobId
+
+❌ 5️⃣ Delete Job (Owner Recruiter)
+DELETE http://localhost:9265/api/jobs/:jobId
+
+👥 6️⃣ View Job Applicants (Recruiter)
+GET http://localhost:9265/api/jobs/:jobId/applicants
+
+
+{
+    "success": true,
+    "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NDE4ZmRmNDBlNmE3N2ExNmE4ZTFiZSIsInJvbGUiOiJyZWNydWl0ZXIiLCJpYXQiOjE3NjU5MDQ1MDYsImV4cCI6MTc2NjUwOTMwNn0.dkByjHomzTPjc95ljMxDJ6RTSXq0czR8b0J2n7xDbbk",
+    "user": {
+        "id": "69418fdf40e6a77a16a8e1be",
+        "name": "Rohit HR",
+        "email": "rohit.hr@techsolutions.com",
+        "role": "recruiter"
+    }
+}
+
+//jobseeker
+
+{
+    "success": true,
+    "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NDE4NDNjNDBlNmE3N2ExNmE4ZTFiNyIsInJvbGUiOiJqb2JzZWVrZXIiLCJpYXQiOjE3NjU5MTI2MzUsImV4cCI6MTc2NjUxNzQzNX0.3ZLI0TG0TCEIM3_Ljb8BicV5hYPQAEZL2YUoBwCsyh8",
+    "user": {
+        "id": "6941843c40e6a77a16a8e1b7",
+        "name": "Amit Kumar",
+        "email": "amit@gmail.com",
+        "role": "jobseeker"
+    }
+}
+
+1️⃣ Apply for Job (Job Seeker)
+Method
+POST
+
+URL
+/api/applications/apply
+
+Full URL
+http://localhost:9265/api/applications/apply
+
+Headers
+Authorization: Bearer <JOBSEEKER_TOKEN>
+Content-Type: application/json
+
+Body
+{
+  "jobId": "65abc123def4567890abcd12",
+  "resume": "https://drive.google.com/resume.pdf",
+  "coverLetter": "I am very interested in this position"
+}
+
+2️⃣ My Applications (Job Seeker)
+Method
+GET
+
+URL
+/api/applications/my
+
+Full URL
+http://localhost:9265/api/applications/my
+
+Headers
+Authorization: Bearer <JOBSEEKER_TOKEN>
+
+3️⃣ Get Applications for a Job (Recruiter)
+Method
+GET
+
+URL
+/api/applications/job/:jobId
+
+Example
+http://localhost:9265/api/applications/job/65abc123def4567890abcd12
+
+Headers
+Authorization: Bearer <RECRUITER_TOKEN>
+
+4️⃣ Update Application Status (Recruiter)
+Method
+PUT
+
+URL
+/api/applications/:applicationId
+
+Example
+http://localhost:9265/api/applications/65ff12ab34cd56ef7890abcd
+
+Headers
+Authorization: Bearer <RECRUITER_TOKEN>
+Content-Type: application/json
+
+Body
+{
+  "status": "shortlisted"
+}
+
+🔐 TOKEN KA RULE (CONFUSION CLEAR)
+
+Job Seeker Token → apply job, my applications
+
+Recruiter Token → view applicants, update status
+
+👉 Token login API se milta hai, MongoDB me nahi store hota
+(jo tu pehle pooch raha tha – ye correct behaviour hai ✔️)
+
+⚠️ IMPORTANT FIX (MUST DO)
+
+Teri file me ye issue hai:
+
+Duplicate controller code pasted twice
+
+Typo: mimport Application...
+
+✅ Solution
+
+👉 Second half delete kar de
+👉 Sirf ek baar import + ek set of controllers rakhe
+
+Agar bole to main:
+
+✔️ clean applicationRoutes.js
+
+✔️ proper folder structure
+
+✔️ unique index in Application model
+
+✔️ Postman collection
+
+sab ek saath bana dunga 🔥
+Bas bol bhai 💪
+
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NDU3N2RjNTAwY2M0YWY2ZDg5MjlhMCIsInJvbGUiOiJyZWNydWl0ZXIiLCJpYXQiOjE3NjYxNjM1NzAsImV4cCI6MTc2Njc2ODM3MH0.ZUdP8h08S93gy9_mRpc_nTiyb_xjpP55LJTU4q1p_sU
