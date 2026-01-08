@@ -1,5 +1,7 @@
+// src/pages/Signup.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import API from "../services/api"; // Axios instance with baseURL
 
 function Signup() {
   const navigate = useNavigate();
@@ -11,36 +13,43 @@ function Signup() {
     role: "jobseeker", // default
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  /* ================= HANDLE INPUT CHANGE ================= */
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
+  /* ================= HANDLE FORM SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const res = await fetch("http://localhost:9265/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
+      const { data } = await API.post("/auth/register", formData);
 
       if (data.success) {
+        // Signup success → redirect to signin
         alert("Signup successful 🎉");
         navigate("/signin");
       } else {
-        alert(data.message || "Signup failed");
+        throw new Error(data.message || "Signup failed");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Server error");
+    } catch (err) {
+      console.error("SIGNUP ERROR:", err);
+      setError(err.response?.data?.message || err.message || "Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  /* ================= UI ================= */
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
@@ -52,6 +61,13 @@ function Signup() {
         <p className="text-center text-gray-500 mb-6">
           Start your journey with better opportunities
         </p>
+
+        {/* Error */}
+        {error && (
+          <div className="bg-red-100 text-red-600 p-2 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -113,9 +129,10 @@ function Signup() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition disabled:opacity-60"
           >
-            Sign up
+            {loading ? "Signing up..." : "Sign up"}
           </button>
         </form>
 

@@ -158,3 +158,49 @@ Bas bol bhai 💪
 
 
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NDU3N2RjNTAwY2M0YWY2ZDg5MjlhMCIsInJvbGUiOiJyZWNydWl0ZXIiLCJpYXQiOjE3NjYxNjM1NzAsImV4cCI6MTc2Njc2ODM3MH0.ZUdP8h08S93gy9_mRpc_nTiyb_xjpP55LJTU4q1p_sU
+
+
+
+
+
+
+
+
+
+////deployed
+
+// POST https://job-portal-render.onrender.com/api/auth/login
+// POST https://job-portal-render.onrender.com/api/auth/register
+
+{
+    "success": true,
+    "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NWZmMTZkNmVjZDQwZGY4YTgzMWZkYSIsInJvbGUiOiJqb2JzZWVrZXIiLCJpYXQiOjE3Njc4OTU5NTUsImV4cCI6MTc2ODUwMDc1NX0.daa6QEcF4MAqHcESfquQuDwyCQ-o4rk2JVre67RHJjM",
+    "user": {
+        "id": "695ff16d6ecd40df8a831fda",
+        "name": "Rahul",
+        "email": "rahul@gmail.com",
+        "role": "jobseeker"
+    }
+}
+
+
+
+
+{
+    "success": true,
+    "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NWZmMjM5NmVjZDQwZGY4YTgzMWZkZCIsInJvbGUiOiJyZWNydWl0ZXIiLCJpYXQiOjE3Njc4OTYwNzYsImV4cCI6MTc2ODUwMDg3Nn0.guDwc0cza2yndNOIKAuRai7xw97XkSQ1ib4IhyT38RI",
+    "user": {
+        "id": "695ff2396ecd40df8a831fdd",
+        "name": "Amit Sharma",
+        "email": "amit@company.com",
+        "role": "recruiter"
+    }
+}
+
+//create a job
+
+https://job-portal-render.onrender.com/api/jobs
+
+//

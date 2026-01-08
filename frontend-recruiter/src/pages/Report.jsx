@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api"; // Axios instance with token interceptor
 
 const Report = () => {
   const [loading, setLoading] = useState(true);
@@ -9,26 +9,12 @@ const Report = () => {
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          setError("Session expired. Please login again.");
-          return;
-        }
-
-        const res = await axios.get(
-          "http://localhost:9265/api/reports/recruiter",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await API.get("/reports/recruiter"); // live backend
 
         setReport(res.data);
       } catch (err) {
-        console.error(err);
-        setError("Failed to load report");
+        console.error("FETCH REPORT ERROR:", err);
+        setError("Failed to load report. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -38,7 +24,6 @@ const Report = () => {
   }, []);
 
   /* ================= STATES ================= */
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -56,39 +41,30 @@ const Report = () => {
   }
 
   /* ================= UI ================= */
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-800">
-          Reports & Analytics
-        </h1>
-        <p className="text-gray-500">
-          Overview of your recruitment performance
-        </p>
+        <h1 className="text-3xl font-bold text-gray-800">Reports & Analytics</h1>
+        <p className="text-gray-500">Overview of your recruitment performance</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatCard title="Total Jobs" value={report.totalJobs} />
-        <StatCard title="Applications" value={report.totalApplications} />
-        <StatCard title="Accepted" value={report.accepted} color="green" />
-        <StatCard title="Rejected" value={report.rejected} color="red" />
+        <StatCard title="Total Jobs" value={report?.totalJobs || 0} />
+        <StatCard title="Applications" value={report?.totalApplications || 0} />
+        <StatCard title="Accepted" value={report?.accepted || 0} color="green" />
+        <StatCard title="Rejected" value={report?.rejected || 0} color="red" />
       </div>
 
       {/* Jobs Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="p-4 border-b">
-          <h2 className="font-semibold text-gray-700">
-            Job-wise Applications
-          </h2>
+          <h2 className="font-semibold text-gray-700">Job-wise Applications</h2>
         </div>
 
-        {report.jobs.length === 0 ? (
-          <p className="p-6 text-center text-gray-500">
-            No jobs found
-          </p>
+        {report?.jobs?.length === 0 ? (
+          <p className="p-6 text-center text-gray-500">No jobs found</p>
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
@@ -99,13 +75,9 @@ const Report = () => {
             </thead>
             <tbody>
               {report.jobs.map((job) => (
-                <tr key={job._id} className="border-t">
-                  <td className="p-3 font-medium">
-                    {job.title}
-                  </td>
-                  <td className="p-3">
-                    {job.applications}
-                  </td>
+                <tr key={job._id} className="border-t hover:bg-gray-50">
+                  <td className="p-3 font-medium">{job.title}</td>
+                  <td className="p-3">{job.applications}</td>
                 </tr>
               ))}
             </tbody>

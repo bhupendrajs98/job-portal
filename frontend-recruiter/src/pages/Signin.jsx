@@ -1,6 +1,7 @@
+// src/pages/Signin.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import API from "../services/api"; // axios instance with baseURL & token interceptor
 
 function Signin() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ function Signin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /* ================= HANDLE INPUT CHANGE ================= */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -21,47 +23,50 @@ function Signin() {
     }));
   };
 
+  /* ================= HANDLE FORM SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-      const { data } = await axios.post(
-        `${API_BASE_URL}/api/auth/login`,
-        {
-          email: formData.email.trim(),
-          password: formData.password,
-        }
-      );
+      // Login request via API instance
+      const { data } = await API.post("/auth/login", {
+        email: formData.email.trim(),
+        password: formData.password,
+      });
 
       if (!data?.token || !data?.user) {
         throw new Error("Invalid response from server");
       }
 
-      // Save auth data
+      // Save auth data in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Role based redirect
-      if (data.user.role === "recruiter") {
-        navigate("/recruiter/dashboard", { replace: true });
-      } else {
-        navigate("/", { replace: true });
+      // Role-based redirect
+      switch (data.user.role) {
+        case "recruiter":
+          navigate("/recruiter/dashboard", { replace: true });
+          break;
+        case "jobseeker":
+          navigate("/", { replace: true });
+          break;
+        default:
+          navigate("/", { replace: true });
       }
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          err.message ||
-          "Unable to login. Try again."
+        err.message ||
+        "Unable to login. Please try again."
       );
     } finally {
       setLoading(false);
     }
   };
 
+  /* ================= UI ================= */
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-lg p-8">
@@ -73,7 +78,7 @@ function Signin() {
           Find your next opportunity
         </p>
 
-        {/* Error */}
+        {/* Error Message */}
         {error && (
           <p className="bg-red-100 text-red-600 p-2 rounded mb-4 text-sm">
             {error}
@@ -82,6 +87,7 @@ function Signin() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Email address
@@ -97,6 +103,7 @@ function Signin() {
             />
           </div>
 
+          {/* Password */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Password
@@ -112,6 +119,7 @@ function Signin() {
             />
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}

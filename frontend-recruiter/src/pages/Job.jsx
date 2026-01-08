@@ -1,26 +1,19 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../../services/api"; // Axios instance with live backend
 
 const Jobs = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:9265/api/jobs",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await API.get("/jobs");
 
         // 🔥 Sirf recruiter ki jobs
         const myJobs = res.data.jobs.filter(
@@ -28,15 +21,18 @@ const Jobs = () => {
         );
 
         setJobs(myJobs);
-      } catch (error) {
-        console.error("FETCH JOBS ERROR", error);
+      } catch (err) {
+        console.error("FETCH JOBS ERROR", err);
+        setError("Failed to load jobs. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchJobs();
-  }, []);
+  }, [user.id]);
+
+  /* ================= UI ================= */
 
   return (
     <div className="space-y-6">
@@ -58,9 +54,12 @@ const Jobs = () => {
 
       {/* Loading */}
       {loading && (
-        <div className="text-center text-gray-500">
-          Loading jobs...
-        </div>
+        <div className="text-center text-gray-500">Loading jobs...</div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="text-center text-red-600">{error}</div>
       )}
 
       {/* Job List */}
@@ -79,9 +78,9 @@ const Jobs = () => {
                 <p className="text-gray-500 text-sm">
                   {job.location} • {job.jobType}
                 </p>
-                {/* <p className="text-sm text-gray-400">
-                  Applicants: {job.applicantsCount || 0}
-                </p> */}
+                <p className="text-sm text-gray-400">
+                  Applicants: {job.applicants?.length || 0}
+                </p>
               </div>
 
               <div className="flex gap-3">
@@ -109,7 +108,7 @@ const Jobs = () => {
       )}
 
       {/* Empty State */}
-      {!loading && jobs.length === 0 && (
+      {!loading && jobs.length === 0 && !error && (
         <div className="bg-white shadow rounded-lg p-10 text-center">
           <p className="text-gray-500">
             You haven’t posted any jobs yet.

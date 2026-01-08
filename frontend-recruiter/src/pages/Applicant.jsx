@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../services/api"; // Axios instance with live backend & token
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -9,26 +9,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          setError("Session expired. Please login again.");
-          return;
-        }
-
-        const res = await axios.get(
-          "http://localhost:9265/api/applications/recruiter/dashboard",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
+        const res = await API.get("/applications/recruiter/dashboard");
         setStats(res.data);
       } catch (err) {
         console.error(err);
-        setError("Failed to load dashboard data");
+        setError(err.response?.data?.message || "Failed to load dashboard data");
       } finally {
         setLoading(false);
       }
@@ -37,25 +22,8 @@ const Dashboard = () => {
     fetchDashboard();
   }, []);
 
-  /* ================= STATES ================= */
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 text-red-700 p-4 rounded">
-        {error}
-      </div>
-    );
-  }
-
-  /* ================= UI ================= */
+  if (loading) return <Loader />;
+  if (error) return <Alert type="error" message={error} />;
 
   return (
     <div className="space-y-6">
@@ -69,7 +37,12 @@ const Dashboard = () => {
         </p>
       </div>
 
-     
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard title="Total Jobs" value={stats.totalJobs} color="blue" />
+        <StatCard title="Total Applications" value={stats.totalApplications} color="green" />
+        <StatCard title="Recent (7 Days)" value={stats.recentApplications} color="purple" />
+      </div>
 
       {/* Applications Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -95,27 +68,15 @@ const Dashboard = () => {
             </thead>
             <tbody>
               {stats.applications.map((app) => (
-                <tr
-                  key={app._id}
-                  className="border-t hover:bg-gray-50"
-                >
+                <tr key={app._id} className="border-t hover:bg-gray-50">
                   <td className="p-3">
-                    <div className="font-medium">
-                      {app.applicant?.name}
-                    </div>
-                    <div className="text-gray-500 text-xs">
-                      {app.applicant?.email}
-                    </div>
+                    <div className="font-medium">{app.applicant?.name}</div>
+                    <div className="text-gray-500 text-xs">{app.applicant?.email}</div>
                   </td>
-
-                  <td className="p-3">
-                    {app.job?.title}
-                  </td>
-
+                  <td className="p-3">{app.job?.title}</td>
                   <td className="p-3 text-gray-600">
                     {new Date(app.createdAt).toLocaleDateString()}
                   </td>
-
                   <td className="p-3">
                     <StatusBadge status={app.status} />
                   </td>
@@ -137,13 +98,10 @@ const StatCard = ({ title, value, color }) => {
     green: "bg-green-100 text-green-700",
     purple: "bg-purple-100 text-purple-700",
   };
-
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="text-gray-500">{title}</div>
-      <div className={`mt-2 text-3xl font-bold ${colors[color]}`}>
-        {value}
-      </div>
+      <div className={`mt-2 text-3xl font-bold ${colors[color]}`}>{value}</div>
     </div>
   );
 };
@@ -154,16 +112,23 @@ const StatusBadge = ({ status }) => {
     accepted: "bg-green-100 text-green-700",
     rejected: "bg-red-100 text-red-700",
   };
-
   return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-        styles[status] || "bg-gray-100 text-gray-600"
-      }`}
-    >
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[status] || "bg-gray-100 text-gray-600"}`}>
       {status || "pending"}
     </span>
   );
 };
+
+const Loader = () => (
+  <div className="flex items-center justify-center h-64">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+const Alert = ({ type, message }) => (
+  <div className={`p-3 rounded mb-4 ${type === "error" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+    {message}
+  </div>
+);
 
 export default Dashboard;

@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FiMapPin, FiBriefcase, FiDollarSign } from "react-icons/fi";
+import API from "../api/API"; // Axios instance with baseURL + token
 
 function JobDetails() {
   const { jobId } = useParams();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:9265/api/jobs/${jobId}`
-        );
-        const data = await res.json();
+        const { data } = await API.get(`/jobs/${jobId}`);
         setJob(data.job || data);
-      } catch (error) {
-        console.error("Failed to fetch job details", error);
+      } catch (err) {
+        console.error("Failed to fetch job details", err);
+        setError("Unable to fetch job details.");
       } finally {
         setLoading(false);
       }
@@ -33,10 +33,10 @@ function JobDetails() {
     );
   }
 
-  if (!job) {
+  if (error || !job) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-xl font-semibold mb-4">Job not found</p>
+        <p className="text-xl font-semibold mb-4">{error || "Job not found"}</p>
         <Link to="/" className="text-blue-600 underline">
           Go back
         </Link>
@@ -47,7 +47,6 @@ function JobDetails() {
   return (
     <section className="w-full min-h-screen bg-gray-50 py-12">
       <div className="max-w-5xl mx-auto px-6">
-        {/* Header */}
         <div className="bg-white rounded-xl shadow p-6 mb-6">
           <h1 className="text-2xl font-bold mb-2">{job.title}</h1>
           <p className="text-gray-700 font-medium">{job.company}</p>
@@ -65,15 +64,13 @@ function JobDetails() {
           </div>
         </div>
 
-        {/* Job Description */}
-        <div className="bg-white rounded-xl shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-3">Job Description</h2>
-          <p className="text-gray-700 leading-relaxed">
-            {job.description}
-          </p>
-        </div>
+        {job.description && (
+          <div className="bg-white rounded-xl shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold mb-3">Job Description</h2>
+            <p className="text-gray-700 leading-relaxed">{job.description}</p>
+          </div>
+        )}
 
-        {/* Skills */}
         {job.skills?.length > 0 && (
           <div className="bg-white rounded-xl shadow p-6 mb-6">
             <h2 className="text-lg font-semibold mb-3">Required Skills</h2>
@@ -90,7 +87,6 @@ function JobDetails() {
           </div>
         )}
 
-        {/* Apply Section */}
         <div className="bg-white rounded-xl shadow p-6 flex justify-between items-center">
           <div>
             <p className="text-sm text-gray-500">

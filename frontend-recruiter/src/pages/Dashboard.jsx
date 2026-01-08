@@ -17,7 +17,7 @@ const Dashboard = () => {
         }
 
         const res = await axios.get(
-          "http://localhost:9265/api/applications/recruiter/dashboard",
+          "https://job-portal-render.onrender.com/api/applications/recruiter/dashboard",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -37,133 +37,92 @@ const Dashboard = () => {
     fetchDashboard();
   }, []);
 
-  /* ================= STATES ================= */
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 text-red-700 p-4 rounded">
-        {error}
-      </div>
-    );
-  }
-
-  /* ================= UI ================= */
+  if (loading) return <Loader />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800">
-          Recruiter Dashboard
-        </h1>
-        <p className="text-gray-500">
-          Overview of your jobs & applications
-        </p>
-      </div>
+      <Header />
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard
-          title="Total Jobs"
-          value={stats.totalJobs}
-          color="blue"
-        />
-        <StatCard
-          title="Total Applications"
-          value={stats.totalApplications}
-          color="green"
-        />
-        <StatCard
-          title="Recent (7 Days)"
-          value={stats.recentApplications}
-          color="purple"
-        />
+        <StatCard title="Total Jobs" value={stats.totalJobs} color="blue" />
+        <StatCard title="Total Applications" value={stats.totalApplications} color="green" />
+        <StatCard title="Recent (7 Days)" value={stats.recentApplications} color="purple" />
       </div>
 
-      {/* Applications Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-700">
-            Recent Applications
-          </h2>
-        </div>
-
-        {stats.applications.length === 0 ? (
-          <p className="p-6 text-gray-500 text-center">
-            No applications found yet.
-          </p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600">
-              <tr>
-                <th className="p-3 text-left">Candidate</th>
-                <th className="p-3 text-left">Job</th>
-                <th className="p-3 text-left">Applied On</th>
-                <th className="p-3 text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.applications.map((app) => (
-                <tr
-                  key={app._id}
-                  className="border-t hover:bg-gray-50"
-                >
-                  <td className="p-3">
-                    <div className="font-medium">
-                      {app.applicant?.name}
-                    </div>
-                    <div className="text-gray-500 text-xs">
-                      {app.applicant?.email}
-                    </div>
-                  </td>
-
-                  <td className="p-3">
-                    {app.job?.title}
-                  </td>
-
-                  <td className="p-3 text-gray-600">
-                    {new Date(app.createdAt).toLocaleDateString()}
-                  </td>
-
-                  <td className="p-3">
-                    <StatusBadge status={app.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <ApplicationsTable applications={stats.applications} />
     </div>
   );
 };
 
-/* ================= REUSABLE COMPONENTS ================= */
+const Loader = () => (
+  <div className="flex items-center justify-center h-64">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+const ErrorMessage = ({ message }) => (
+  <div className="bg-red-100 text-red-700 p-4 rounded">{message}</div>
+);
+
+const Header = () => (
+  <div>
+    <h1 className="text-3xl font-bold text-gray-800">Recruiter Dashboard</h1>
+    <p className="text-gray-500">Overview of your jobs & applications</p>
+  </div>
+);
 
 const StatCard = ({ title, value, color }) => {
   const colors = {
-    blue: "bg-blue-100 text-blue-700",
-    green: "bg-green-100 text-green-700",
-    purple: "bg-purple-100 text-purple-700",
+    blue: "text-blue-700",
+    green: "text-green-700",
+    purple: "text-purple-700",
   };
-
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="text-gray-500">{title}</div>
-      <div className={`mt-2 text-3xl font-bold ${colors[color]}`}>
-        {value}
-      </div>
+      <div className={`mt-2 text-3xl font-bold ${colors[color]}`}>{value}</div>
     </div>
   );
 };
+
+const ApplicationsTable = ({ applications }) => (
+  <div className="bg-white shadow rounded-lg overflow-hidden mt-6">
+    <div className="p-4 border-b">
+      <h2 className="text-lg font-semibold text-gray-700">Recent Applications</h2>
+    </div>
+
+    {applications.length === 0 ? (
+      <p className="p-6 text-gray-500 text-center">No applications found yet.</p>
+    ) : (
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 text-gray-600">
+          <tr>
+            <th className="p-3 text-left">Candidate</th>
+            <th className="p-3 text-left">Job</th>
+            <th className="p-3 text-left">Applied On</th>
+            <th className="p-3 text-left">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {applications.map((app) => (
+            <tr key={app._id} className="border-t hover:bg-gray-50">
+              <td className="p-3">
+                <div className="font-medium">{app.applicant?.name}</div>
+                <div className="text-gray-500 text-xs">{app.applicant?.email}</div>
+              </td>
+              <td className="p-3">{app.job?.title}</td>
+              <td className="p-3 text-gray-600">{new Date(app.createdAt).toLocaleDateString()}</td>
+              <td className="p-3">
+                <StatusBadge status={app.status} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+);
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -171,13 +130,8 @@ const StatusBadge = ({ status }) => {
     accepted: "bg-green-100 text-green-700",
     rejected: "bg-red-100 text-red-700",
   };
-
   return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-        styles[status] || "bg-gray-100 text-gray-600"
-      }`}
-    >
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${styles[status] || "bg-gray-100 text-gray-600"}`}>
       {status || "pending"}
     </span>
   );

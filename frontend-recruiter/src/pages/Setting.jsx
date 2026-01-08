@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../services/api"; // Axios instance with token interceptor
 
 const Setting = () => {
   const [loading, setLoading] = useState(true);
@@ -14,33 +14,20 @@ const Setting = () => {
   });
 
   /* ================= FETCH PROFILE ================= */
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          setError("Session expired. Please login again.");
-          return;
-        }
-
-        const res = await axios.get(
-          "http://localhost:9265/api/users/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await API.get("/users/profile");
+        const user = res.data.user;
 
         setFormData({
-          name: res.data.user.name,
-          email: res.data.user.email,
-          companyName: res.data.user.companyName || "",
+          name: user.name || "",
+          email: user.email || "",
+          companyName: user.companyName || "",
         });
       } catch (err) {
-        setError("Failed to load profile");
+        console.error("FETCH PROFILE ERROR:", err);
+        setError(err.response?.data?.message || "Failed to load profile");
       } finally {
         setLoading(false);
       }
@@ -50,7 +37,6 @@ const Setting = () => {
   }, []);
 
   /* ================= HANDLERS ================= */
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -62,28 +48,17 @@ const Setting = () => {
 
     try {
       setSaving(true);
-      const token = localStorage.getItem("token");
-
-      await axios.put(
-        "http://localhost:9265/api/users/profile",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setSuccess("Profile updated successfully");
+      await API.put("/users/profile", formData);
+      setSuccess("Profile updated successfully 🎉");
     } catch (err) {
-      setError("Failed to update profile");
+      console.error("UPDATE PROFILE ERROR:", err);
+      setError(err.response?.data?.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }
   };
 
   /* ================= STATES ================= */
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -93,29 +68,22 @@ const Setting = () => {
   }
 
   /* ================= UI ================= */
-
   return (
     <div className="max-w-3xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-800">
-          Settings
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
         <p className="text-gray-500">
           Manage your account & company information
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded">
-          {error}
-        </div>
+        <div className="bg-red-100 text-red-700 p-3 rounded">{error}</div>
       )}
 
       {success && (
-        <div className="bg-green-100 text-green-700 p-3 rounded">
-          {success}
-        </div>
+        <div className="bg-green-100 text-green-700 p-3 rounded">{success}</div>
       )}
 
       {/* Profile Form */}

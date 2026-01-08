@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { signupUser } from "../services/api";
 
 function Signup() {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "jobseeker", // default
+    role: "jobseeker",
   });
 
   const handleChange = (e) => {
@@ -19,15 +19,7 @@ function Signup() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:9265/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
+      const { data } = await signupUser(formData);
 
       if (data.success) {
         alert("Signup successful 🎉");
@@ -37,15 +29,13 @@ function Signup() {
       }
     } catch (error) {
       console.error(error);
-      alert("Server error");
+      alert(error.response?.data?.message || "Server error");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
-
-        {/* Header */}
         <h2 className="text-2xl font-bold text-center text-blue-600 mb-2">
           Create your Hireon account
         </h2>
@@ -53,9 +43,7 @@ function Signup() {
           Start your journey with better opportunities
         </p>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <input
             type="text"
             name="name"
@@ -86,7 +74,6 @@ function Signup() {
             className="w-full border px-4 py-2 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
           />
 
-          {/* Role Selection */}
           <div className="flex gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -119,7 +106,6 @@ function Signup() {
           </button>
         </form>
 
-        {/* Footer */}
         <p className="text-center text-gray-600 mt-4">
           Already have an account?{" "}
           <Link to="/signin" className="text-blue-600 font-medium hover:underline">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import API from "../api/API"; // Axios instance with token
 
 function ApplyJob() {
   const { jobId } = useParams();
@@ -11,7 +12,6 @@ function ApplyJob() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ✅ Check if user is logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
@@ -28,40 +28,18 @@ function ApplyJob() {
     setSuccess("");
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Please sign in to apply for this job");
-
-      const res = await fetch(
-        `http://localhost:9265/api/applications/apply/${jobId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ resume, coverLetter }),
-        }
-      );
-
-      const contentType = res.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Session expired. Please sign in again.");
-      }
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to apply");
-      }
+      const { data } = await API.post(`/applications/apply/${jobId}`, {
+        resume,
+        coverLetter,
+      });
 
       setSuccess(data.message);
       setResume("");
       setCoverLetter("");
 
-      // ✅ Redirect after 2s
       setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message || "Failed to apply");
     } finally {
       setLoading(false);
     }
@@ -82,7 +60,6 @@ function ApplyJob() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Resume */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Resume (Google Drive / PDF link)
@@ -97,7 +74,6 @@ function ApplyJob() {
             />
           </div>
 
-          {/* Cover Letter */}
           <div>
             <label className="block text-sm font-medium mb-1">
               Cover Letter
@@ -111,7 +87,6 @@ function ApplyJob() {
             />
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}

@@ -27,8 +27,10 @@ function Signin() {
     setError("");
 
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
       const { data } = await axios.post(
-        "http://localhost:9265/api/auth/login",
+        `${API_BASE_URL}/api/auth/login`,
         {
           email: formData.email.trim(),
           password: formData.password,
@@ -39,11 +41,9 @@ function Signin() {
         throw new Error("Invalid response from server");
       }
 
-      // Save auth data
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Role based redirect
       if (data.user.role === "recruiter") {
         navigate("/recruiter", { replace: true });
       } else {
@@ -52,8 +52,8 @@ function Signin() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        err.message ||
-        "Unable to login. Try again."
+          err.message ||
+          "Unable to login. Try again."
       );
     } finally {
       setLoading(false);
@@ -63,8 +63,6 @@ function Signin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-lg p-8">
-
-        {/* Heading */}
         <h2 className="text-2xl font-bold text-center text-blue-600 mb-2">
           Sign in to Hireon
         </h2>
@@ -72,14 +70,12 @@ function Signin() {
           Find your next opportunity
         </p>
 
-        {/* Error */}
         {error && (
           <p className="bg-red-100 text-red-600 p-2 rounded mb-4 text-sm">
             {error}
           </p>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -91,8 +87,7 @@ function Signin() {
               value={formData.email}
               onChange={handleChange}
               required
-              placeholder="you@example.com"
-              className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-lg px-4 py-2"
             />
           </div>
 
@@ -106,27 +101,22 @@ function Signin() {
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="••••••••"
-              className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-lg px-4 py-2"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-60"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
-        {/* Footer */}
-        <p className="text-sm text-center mt-6 text-gray-600">
+        <p className="text-sm text-center mt-6">
           Don’t have an account?{" "}
-          <Link
-            to="/signup"
-            className="text-blue-600 font-medium hover:underline"
-          >
+          <Link to="/signup" className="text-blue-600">
             Sign up
           </Link>
         </p>

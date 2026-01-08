@@ -24,12 +24,14 @@ const jobSchema = new mongoose.Schema(
         type: String,
       },
     ],
-
-    jobType: {
-      type: String,
-      enum: ["Full-time", "Part-time", "Internship", "Remote"],
-      required: true,
-    },
+jobType: {
+  type: String,
+  enum: {
+    values: ["Full-time", "Part-time", "Internship", "Remote"],
+    message: "Invalid job type"
+  }
+}
+,
     experienceLevel: {
       type: String,
       enum: ["fresher", "junior", "mid", "senior"],
