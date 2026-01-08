@@ -1,8 +1,9 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:9265/api",
+  baseURL: "https://job-portal-render.onrender.com", // live backend
 });
+
 
 /* ===============================
    TOKEN INTERCEPTOR

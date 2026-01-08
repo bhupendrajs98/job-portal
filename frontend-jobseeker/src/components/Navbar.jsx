@@ -5,38 +5,37 @@ function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/signin");
   };
 
-  const handlePostJob = () => {
-    // Get recruiter app URL from environment variable or fallback to localhost
-    const recruiterAppURL = import.meta.env.VITE_RECRUITER_APP_URL || "http://localhost:5174";
+  // Post Job handler: redirects to Recruiter app
+  // const handlePostJob = () => {
+  //   // Get recruiter app URL from .env or fallback to localhost for dev
+  //   const recruiterAppURL =
+  //     import.meta.env.VITE_RECRUITER_APP_URL || "http://localhost:5174";
 
-    // Check if user is logged in
-    const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     // Redirect to recruiter login if not logged in
+  //     window.location.href = `${recruiterAppURL}`;
+  //     return;
+  //   }
 
-    if (!token) {
-      // Redirect to recruiter login page
-      // Using hash (#) to avoid Netlify 404 issues
-      window.location.href = `${recruiterAppURL}/#/login`;
-      return;
-    }
-
-    // Redirect to recruiter post-job page/dashboard
-    window.location.href = `${recruiterAppURL}/#/post-job`;
-  };
+  //   // Redirect to recruiter post job/dashboard if logged in
+  //   window.location.href = `${recruiterAppURL}/post-job`;
+  // };
 
   return (
-    <nav className="w-full bg-white shadow-md">
+    <nav className="w-full bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         {/* Left Section */}
         <div className="flex items-center gap-10">
           <h1
             onClick={() => navigate("/")}
-            className="text-2xl font-bold text-blue-600 cursor-pointer"
+            className="text-2xl font-bold text-blue-600 cursor-pointer hover:text-blue-700 transition"
           >
             Hireon
           </h1>
@@ -79,8 +78,10 @@ function Navbar() {
           )}
 
           <button
-            onClick={handlePostJob}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            onClick={() =>
+              (window.location.href = "https://hireon-recruiter.netlify.app/")
+            }
+            className="bg-blue-600 text-white px-5 py-2 rounded-md font-semibold hover:bg-blue-700 transition shadow"
           >
             Post Job
           </button>
