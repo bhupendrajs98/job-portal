@@ -5,20 +5,19 @@ function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/signin");
   };
 
+  // Post Job handler
   const handlePostJob = () => {
-    const recruiterAppURL =
-      import.meta.env.VITE_RECRUITER_APP_URL || "http://localhost:5174";
-
-    const token = localStorage.getItem("token");
+    const recruiterAppURL = "https://hireon-recruiter.netlify.app";
 
     if (!token) {
-      // Redirect to recruiter login
+      // Redirect to recruiter login if not logged in
       window.location.href = `${recruiterAppURL}/login`;
       return;
     }
@@ -35,26 +34,20 @@ function Navbar() {
         <div className="flex items-center gap-10">
           <h1
             onClick={() => navigate("/")}
-            className="text-2xl font-bold text-blue-600 cursor-pointer"
+            className="text-2xl font-bold text-blue-600 cursor-pointer hover:text-blue-700 transition"
           >
             Hireon
           </h1>
 
           <ul className="hidden md:flex gap-6 text-gray-700 font-medium">
             <li>
-              <Link to="/" className="hover:text-blue-600 transition">
-                Home
-              </Link>
+              <Link to="/" className="hover:text-blue-600 transition">Home</Link>
             </li>
             <li>
-              <Link to="/reviews" className="hover:text-blue-600 transition">
-                Company Reviews
-              </Link>
+              <Link to="/reviews" className="hover:text-blue-600 transition">Company Reviews</Link>
             </li>
             <li>
-              <Link to="/salary" className="hover:text-blue-600 transition">
-                Salary Guide
-              </Link>
+              <Link to="/salary" className="hover:text-blue-600 transition">Salary Guide</Link>
             </li>
           </ul>
         </div>
