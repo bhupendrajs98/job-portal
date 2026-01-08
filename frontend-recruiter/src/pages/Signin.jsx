@@ -27,8 +27,10 @@ function Signin() {
     setError("");
 
     try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
       const { data } = await axios.post(
-        "http://localhost:9265/api/auth/login",
+        `${API_BASE_URL}/api/auth/login`,
         {
           email: formData.email.trim(),
           password: formData.password,
@@ -52,8 +54,8 @@ function Signin() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        err.message ||
-        "Unable to login. Try again."
+          err.message ||
+          "Unable to login. Try again."
       );
     } finally {
       setLoading(false);
@@ -63,7 +65,6 @@ function Signin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-lg p-8">
-
         {/* Heading */}
         <h2 className="text-2xl font-bold text-center text-blue-600 mb-2">
           Sign in to Hireon
