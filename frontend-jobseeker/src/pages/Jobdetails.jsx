@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FiMapPin, FiBriefcase, FiDollarSign } from "react-icons/fi";
-import API from "../api/API"; // Axios instance with baseURL + token
+import API from "../api/api.js"; // Axios instance with baseURL + token
 
 function JobDetails() {
   const { jobId } = useParams();

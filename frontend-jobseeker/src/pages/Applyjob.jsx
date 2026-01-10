@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import API from "../api/API"; // Axios instance with token
+import API from "../api/api.js"; // Axios instance with token
 
 function ApplyJob() {
   const { jobId } = useParams();
